@@ -13,7 +13,38 @@ final class CounterModel {
     private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - Init
-    init() {}
+    init() {
+        configureBundings()
+    }
     
-    // MARK: - API
+    // MARK: - Configure Bundings
+    private func configureBundings() {
+        incrementActionSubject
+            .sink(receiveValue: { [weak self] in
+                self?.counter += 1
+                self?.counterTitleSubject.send("Counter - \(self?.counter ?? 0)")
+            })
+            .store(in: &cancellables)
+        
+        decrementActionSubject
+            .sink(receiveValue: { [weak self] in
+                self?.counter -= 1
+                self?.counterTitleSubject.send("Counter - \(self?.counter ?? 0)")
+            })
+            .store(in: &cancellables)
+        
+        multiplyActionSubject
+            .sink(receiveValue: { [weak self] in
+                    self?.counter *= 2
+                self?.counterTitleSubject.send("Counter - \(self?.counter ?? 0)")
+            })
+            .store(in: &cancellables)
+     
+        resetActionSubject
+            .sink(receiveValue: { [weak self] in
+                self?.counter = 0
+                self?.counterTitleSubject.send("Counter - \(self?.counter ?? 0)")
+            })
+            .store(in: &cancellables)
+    }
 }
